@@ -1,14 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragment_Search">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="@color/black"
+        app:cardCornerRadius="25dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="25dp"
+            android:text="Keyword*"
+            android:textColor="@color/green"
+            android:textSize="21sp"
+            tools:ignore="HardcodedText" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/keyword_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:autofillHints=""
+                android:backgroundTint="@color/black"
+                android:hint="Enter the Keyword"
+                android:textColor="@color/white"
+                android:textColorHint="@android:color/darker_gray"
+                android:textCursorDrawable="@drawable/form_cursor"
+                tools:ignore="HardcodedText,LabelFor,MissingConstraints">
+
+                <requestFocus />
+            </AutoCompleteTextView>
+
+            <ProgressBar
+
+                android:id="@+id/spinner_keyword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="20dp"
+                android:indeterminateTint="@color/green"
+                android:scaleX="0.5"
+                android:scaleY="0.5"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/keyword_input" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="90dp"
+            android:layout_marginEnd="25dp"
+            android:background="@color/green">
+
+        </View>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="120dp"
+            android:text="Distance(Miles)*"
+            android:textColor="@color/green"
+            android:textSize="21sp"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/distance_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="150dp"
+            android:backgroundTint="@color/black"
+            android:inputType="number"
+            android:text="10"
+            android:textColor="@color/white"
+            android:textCursorDrawable="@drawable/form_cursor"
+            tools:ignore="HardcodedText">
+
+        </EditText>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="190dp"
+            android:layout_marginEnd="25dp"
+            android:background="@color/green">
+
+        </View>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="220dp"
+            android:text="Category*"
+            android:textColor="@color/green"
+            android:textSize="21sp"
+            tools:ignore="HardcodedText" />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="260dp"
+            android:backgroundTint="@color/green"
+            android:entries="@array/categories"
+            android:spinnerMode="dropdown">
+
+        </Spinner>
+
+        <RelativeLayout
+            android:layout_width="338dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="290dp">
+
+            <TextView
+                android:id="@+id/location_label"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Location*"
+                android:textColor="@color/green"
+                android:textSize="21sp"
+                tools:ignore="HardcodedText,MissingConstraints" />
+
+            <TextView
+                android:id="@+id/auto_detect_label"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@+id/location_label"
+                android:text="Auto-Detect"
+                android:textColor="@color/gray"
+                android:textSize="18sp"
+                tools:ignore="HardcodedText,MissingConstraints" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/auto_detect_label"
+                android:checked="false"
+                app:thumbTint="@drawable/switch_color"
+                app:trackTint="@drawable/track">
+
+            </androidx.appcompat.widget.SwitchCompat>
+
+
+        </RelativeLayout>
+
+
+        <EditText
+            android:id="@+id/location_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="330dp"
+            android:backgroundTint="@color/black"
+            android:hint="Enter the Location"
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/darker_gray"
+            android:textCursorDrawable="@drawable/form_cursor"
+            tools:ignore="HardcodedText" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="370dp"
+            android:layout_marginEnd="25dp"
+            android:background="@color/green">
+
+        </View>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="450dp"
+            android:layout_marginBottom="20dp">
+
+            <Button
+                android:id="@+id/button_search"
+                android:layout_width="145dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:background="@drawable/background_green_button"
+                android:text="Search"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                app:backgroundTint="@null"
+                tools:ignore="HardcodedText">
+
+            </Button>
+
+            <Button
+                android:id="@+id/button_clear"
+                android:layout_width="145dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@+id/button_search"
+                android:background="@drawable/background_orange_button"
+                android:text="Clear"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                app:backgroundTint="@null"
+                tools:ignore="HardcodedText">
+
+            </Button>
+
+
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
 
 </FrameLayout>

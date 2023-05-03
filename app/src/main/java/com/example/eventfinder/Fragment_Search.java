@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -60,6 +60,12 @@ public class Fragment_Search extends Fragment {
         AutoCompleteTextView keywordInput = view.findViewById(R.id.keyword_input);
         keywordInput.setThreshold(1);
 
+
+        Spinner categoryDropdown = view.findViewById(R.id.category_input);
+        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.category_array, R.layout.category_layout);
+        categoryAdapter.setDropDownViewResource(R.layout.category_dropdown_layout);
+        categoryDropdown.setAdapter(categoryAdapter);
+
         ProgressBar keywordSpinner = view.findViewById(R.id.spinner_keyword);
         keywordSpinner.setVisibility(View.GONE);
 
@@ -76,7 +82,7 @@ public class Fragment_Search extends Fragment {
                     keywordSpinner.setVisibility(View.VISIBLE);
                     getSuggestedKeywords(currentKeyword, autocomplete_strings -> {
                         keywordSpinner.setVisibility(View.GONE);
-                        ArrayAdapter keywordsAdapter = new ArrayAdapter(requireContext(), R.layout.keyword_autocomplete_layout, autocomplete_strings);
+                        ArrayAdapter<String> keywordsAdapter = new ArrayAdapter<>(requireContext(), R.layout.keyword_autocomplete_layout, autocomplete_strings);
                         keywordInput.setAdapter(keywordsAdapter);
                         keywordsAdapter.notifyDataSetChanged();
 
@@ -89,6 +95,7 @@ public class Fragment_Search extends Fragment {
 
             }
         });
+
 
     }
 

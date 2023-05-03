@@ -119,12 +119,13 @@
             tools:ignore="HardcodedText" />
 
         <Spinner
+            android:id="@+id/category_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="260dp"
             android:backgroundTint="@color/green"
-            android:entries="@array/categories"
+            android:entries="@array/category_array"
             android:spinnerMode="dropdown">
 
         </Spinner>

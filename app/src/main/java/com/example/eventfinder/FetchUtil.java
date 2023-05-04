@@ -17,7 +17,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class FetchUtil {
@@ -36,7 +38,7 @@ public class FetchUtil {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
+                Log.e("FetchUtil", error.toString());
             }
         });
         Volley.newRequestQueue(context).add(req);
@@ -53,13 +55,13 @@ public class FetchUtil {
                     JSONObject loc = jsonObject.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
                     callOnFinished.accept(loc);
                 } catch (JSONException e) {
-                    Log.e("Fragment_Search", e.toString());
+                    Log.e("FetchUtil", e.toString());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
+                Log.e("FetchUtil", error.toString());
             }
         });
         Volley.newRequestQueue(context).add(request);
@@ -73,13 +75,13 @@ public class FetchUtil {
                 try {
                     callOnFinished.accept(new JSONObject(response).getString("loc"));
                 } catch (JSONException e) {
-                    Log.e("Fragment_Search", e.toString());
+                    Log.e("FetchUtil", e.toString());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
+                Log.e("FetchUtil", error.toString());
             }
         });
 
@@ -99,7 +101,7 @@ public class FetchUtil {
                     attractions = response.getJSONObject("_embedded").getJSONArray("attractions");
 
                 } catch (JSONException e) {
-                    
+
                     attractions = new JSONArray();
                 }
 
@@ -108,7 +110,7 @@ public class FetchUtil {
 
                         keywordsResponse.add(attractions.getJSONObject(i).getString("name"));
                     } catch (JSONException e) {
-                        Log.e("getAutocompleteSuggestions", e.toString());
+                        Log.e("FetchUtil", e.toString());
                     }
                 }
 
@@ -117,11 +119,82 @@ public class FetchUtil {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
+                Log.e("FetchUtil", error.toString());
             }
         });
 
         Volley.newRequestQueue(context).add(req);
+    }
+
+    public static void fetchSpecificEvent(Context context, String eventId, Consumer<JSONObject> callOnFinished) {
+        String eventsUrl = "https://assignment8csci571.uw.r.appspot.com/events/" + eventId;
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, eventsUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                callOnFinished.accept(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FetchUtil", error.toString());
+            }
+        });
+        Volley.newRequestQueue(context).add(req);
+    }
+
+    public static void getArtistsData(Context context, List<String> artistNames, Consumer<Map<String, JSONObject>> callOnFinished) {
+        int totalNumberOfArtists = artistNames.size();
+
+        Map<String, JSONObject> artistsMap = new HashMap<>();
+
+        for (int i = 0; i < artistNames.size(); i++) {
+            String artistName = artistNames.get(i);
+            String artistUrl = "https://assignment8csci571.uw.r.appspot.com/artists/" + artistName;
+            JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, artistUrl, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject artistResponse) {
+                    artistsMap.put(artistName, artistResponse);
+                    if (artistsMap.size() == totalNumberOfArtists) {
+                        callOnFinished.accept(artistsMap);
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("FetchUtil", error.toString());
+                }
+            });
+            Volley.newRequestQueue(context).add(req);
+        }
+
+    }
+
+
+    public static void fetchAlbumsFromArtistIds(Context context, List<String> artistIDs, Consumer<Map<String, JSONObject>> callOnFinished) {
+        int totalNumberOfArtists = artistIDs.size();
+
+        Map<String, JSONObject> artistAlbumsMap = new HashMap<>();
+
+        for (int i = 0; i < artistIDs.size(); i++) {
+            String artistID = artistIDs.get(i);
+            String albumURL = "https://assignment8csci571.uw.r.appspot.com/albums/" + artistID;
+            JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, albumURL, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject albumsResponse) {
+                    artistAlbumsMap.put(artistID, albumsResponse);
+                    if (artistAlbumsMap.size() == totalNumberOfArtists) {
+                        callOnFinished.accept(artistAlbumsMap);
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("FetchUtil", error.toString());
+                }
+            });
+            Volley.newRequestQueue(context).add(req);
+        }
+
     }
 
 

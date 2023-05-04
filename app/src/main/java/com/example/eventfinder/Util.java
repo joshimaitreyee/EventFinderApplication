@@ -9,8 +9,13 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -66,6 +71,45 @@ public final class Util {
 
     public static String getGeoCode(String latitude, String longitude) {
         return GeoHash.geoHashStringWithCharacterPrecision(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
+    }
+
+    public static ArrayList<String> extractArtistNames(JSONObject eventResponse) throws JSONException {
+        JSONArray attractions_array = eventResponse.getJSONObject("_embedded").getJSONArray("attractions");
+        ArrayList<String> keywords_list = new ArrayList<>();
+
+        for (int i = 0; i < attractions_array.length(); i++) {
+            JSONObject attraction = attractions_array.getJSONObject(i);
+            JSONArray classifications = attraction.optJSONArray("classifications");
+
+            if (classifications != null && classifications.length() > 0) {
+                JSONObject segment = classifications.getJSONObject(0).optJSONObject("segment");
+
+                if (segment != null && segment.optString("name").equals("Music")) {
+                    String name = attraction.optString("name");
+
+                    if (!name.isEmpty()) {
+                        keywords_list.add(name);
+                    }
+                }
+            }
+        }
+
+        return keywords_list;
+    }
+
+    public static String getFollowers(String followers) {
+
+        int followersInteger = Integer.parseInt(followers);
+        if (followersInteger >= 1000000) {
+            followersInteger = followersInteger / 1000000;
+            return followersInteger + "M Followers";
+        } else if (followersInteger >= 1000) {
+            followersInteger = followersInteger / 1000;
+            return followersInteger + "K Followers";
+        } else {
+            return followers + " Followers";
+        }
+
     }
 }
 

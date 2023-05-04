@@ -9,6 +9,14 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
+
+import ch.hsr.geohash.GeoHash;
+
 public final class Util {
 
     private Util() {
@@ -25,6 +33,39 @@ public final class Util {
         snackbar.getView().setLayoutParams(config);
         snackbar.show();
 
+    }
+
+    public static String getTime(String timeString) {
+
+        SimpleDateFormat requiredFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        Date date = null;
+        try {
+            date = requiredFormat.parse(timeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat returnDate = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        return date != null ? returnDate.format(date) : null;
+    }
+
+    public static String getSegment(String category) {
+        if (Objects.equals(category, "Music")) {
+            return "KZFzniwnSyZfZ7v7nJ";
+        } else if (Objects.equals(category, "Sports")) {
+            return "KZFzniwnSyZfZ7v7nE";
+        } else if (Objects.equals(category, "Arts & Theatre")) {
+            return "KZFzniwnSyZfZ7v7na";
+        } else if (Objects.equals(category, "Film")) {
+            return "KZFzniwnSyZfZ7v7nn";
+        } else if (Objects.equals(category, "Miscellaneous")) {
+            return "KZFzniwnSyZfZ7v7n1";
+        } else {
+            return "";
+        }
+    }
+
+    public static String getGeoCode(String latitude, String longitude) {
+        return GeoHash.geoHashStringWithCharacterPrecision(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
     }
 }
 

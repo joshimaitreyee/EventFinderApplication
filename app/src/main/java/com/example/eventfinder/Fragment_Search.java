@@ -7,6 +7,8 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,26 +29,28 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
+
 import com.android.volley.toolbox.Volley;
 
-import ch.hsr.geohash.GeoHash;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
 import java.util.List;
+
 import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link Fragment_Search#newInstance} factory method to
+ * Use the {@link Fragment_Search} factory method to
  * create an instance of this fragment.
  */
 public class Fragment_Search extends Fragment {
@@ -65,10 +69,7 @@ public class Fragment_Search extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment__search, container, false);
-
-
         formSetup(view);
-
         return view;
     }
 
@@ -120,7 +121,7 @@ public class Fragment_Search extends Fragment {
         ((Button) view.findViewById(R.id.button_search)).setOnClickListener(view1 -> {
             String keyword_value = keywordInput.getText().toString();
             String location_value = location.getText().toString();
-            String segment = getSegment(categoryDropdown.getSelectedItem().toString());
+            String segment = Util.getSegment(categoryDropdown.getSelectedItem().toString());
             String distance_value = distance.getText().toString();
             Boolean autoDetect_value = autoDetect.isChecked();
 
@@ -170,7 +171,7 @@ public class Fragment_Search extends Fragment {
                                     @Override
                                     public void onAnimationStart(Animation animation) {
                                         requireView().findViewById(R.id.back_arrow_search_layout).setVisibility(View.GONE);
-                                        //view.findViewById(R.id.events_recycler_view).setVisibility(View.GONE);
+                                        view.findViewById(R.id.search_results_recycler).setVisibility(View.GONE);
                                         //view.findViewById(R.id.no_events_card).setVisibility(View.GONE);
                                         searchForm.setVisibility(View.VISIBLE);
                                     }
@@ -199,17 +200,21 @@ public class Fragment_Search extends Fragment {
                 searchForm.startAnimation(animation);
 
                 if (autoDetect_value) {
-                    getUserLocation(new Consumer<String>() {
+                    FetchUtil.getUserLocation(requireContext(), new Consumer<String>() {
                         @Override
                         public void accept(String userLocation) {
                             String latitude = userLocation.split(",")[0].trim();
                             String longitude = userLocation.split(",")[1].trim();
-                            String geocode = getGeoCode(latitude, longitude);
+                            String geocode = Util.getGeoCode(latitude, longitude);
 
-                            searchEvents(keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
+                            FetchUtil.searchEvents(requireContext(), keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
                                 @Override
                                 public void accept(JSONObject jsonObject) {
-                                    Log.e("Fragment_Search", jsonObject.toString());
+                                    try {
+                                        processEvents(jsonObject);
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             });
 
@@ -217,19 +222,23 @@ public class Fragment_Search extends Fragment {
                         }
                     });
                 } else {
-                    getCoordinatesOfLocation(location_value, new Consumer<JSONObject>() {
+                    FetchUtil.getCoordinatesOfLocation(requireContext(), location_value, new Consumer<JSONObject>() {
                         @Override
                         public void accept(JSONObject locationObject) {
 
                             try {
                                 String latitude = locationObject.getString("lat");
                                 String longitude = locationObject.getString("lng");
-                                String geocode = getGeoCode(latitude, longitude);
+                                String geocode = Util.getGeoCode(latitude, longitude);
 
-                                searchEvents(keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
+                                FetchUtil.searchEvents(requireContext(), keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
                                     @Override
                                     public void accept(JSONObject jsonObject) {
-                                        Log.e("Fragment_Search", jsonObject.toString());
+                                        try {
+                                            processEvents(jsonObject);
+                                        } catch (JSONException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                     }
                                 });
 
@@ -259,7 +268,7 @@ public class Fragment_Search extends Fragment {
                 String currentKeyword = keyword.toString();
                 if (!currentKeyword.trim().isEmpty()) {
                     keywordSpinner.setVisibility(View.VISIBLE);
-                    getSuggestedKeywords(currentKeyword, autocomplete_strings -> {
+                    FetchUtil.getSuggestedKeywords(getContext(), currentKeyword, autocomplete_strings -> {
                         keywordSpinner.setVisibility(View.GONE);
                         ArrayAdapter<String> keywordsAdapter = new ArrayAdapter<>(requireContext(), R.layout.keyword_autocomplete_layout, autocomplete_strings);
                         keywordInput.setAdapter(keywordsAdapter);
@@ -282,121 +291,55 @@ public class Fragment_Search extends Fragment {
         return !distance.trim().isEmpty() && !keyword.trim().isEmpty() && (autoDetect || !location.trim().isEmpty());
     }
 
-    private void getSuggestedKeywords(String keyword, Consumer<List<String>> callOnFinished) {
-        String suggestionsUrl = "https://assignment8csci571.uw.r.appspot.com/suggestions/" + keyword;
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, suggestionsUrl, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                List<String> keywordsResponse = new ArrayList<>();
-                JSONArray attractions;
-                try {
-                    attractions = response.getJSONObject("_embedded").getJSONArray("attractions");
+    private void processEvents(JSONObject eventsJSON) throws JSONException {
 
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
+        List<JSONObject> eventsArrayForAdapter = new ArrayList<>();
+        RecyclerView search_results_recycler = requireView().findViewById(R.id.search_results_recycler);
 
-                for (int i = 0; i < attractions.length(); i++) {
-                    try {
+        JSONArray eventsAllDataArray = new JSONArray();
 
-                        keywordsResponse.add(attractions.getJSONObject(i).getString("name"));
-                    } catch (JSONException e) {
-                        Log.e("getAutocompleteSuggestions", e.toString());
-                    }
-                }
-
-                callOnFinished.accept(keywordsResponse);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
-            }
-        });
-
-        Volley.newRequestQueue(requireContext()).add(req);
-    }
-
-
-    private void getUserLocation(Consumer<String> callOnFinished) {
-
-        StringRequest request = new StringRequest(Request.Method.GET, "https://ipinfo.io/json?token=ae60cdde61b4e8", new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    callOnFinished.accept(new JSONObject(response).getString("loc"));
-                } catch (JSONException e) {
-                    Log.e("Fragment_Search", e.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
-            }
-        });
-
-        Volley.newRequestQueue(requireContext()).add(request);
-    }
-
-    private String getGeoCode(String latitude, String longitude) {
-        return GeoHash.geoHashStringWithCharacterPrecision(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
-    }
-
-    private String getSegment(String category) {
-        if (Objects.equals(category, "Music")) {
-            return "KZFzniwnSyZfZ7v7nJ";
-        } else if (Objects.equals(category, "Sports")) {
-            return "KZFzniwnSyZfZ7v7nE";
-        } else if (Objects.equals(category, "Arts & Theatre")) {
-            return "KZFzniwnSyZfZ7v7na";
-        } else if (Objects.equals(category, "Film")) {
-            return "KZFzniwnSyZfZ7v7nn";
-        } else if (Objects.equals(category, "Miscellaneous")) {
-            return "KZFzniwnSyZfZ7v7n1";
+        if (eventsJSON.has("_embedded")) {
+            eventsAllDataArray = Objects.requireNonNull(eventsJSON.optJSONObject("_embedded")).optJSONArray("events");
         } else {
-            return "";
+            //view.findViewById(R.id.no_events_card).setVisibility(View.VISIBLE);
         }
-    }
 
-    private void getCoordinatesOfLocation(String location, Consumer<JSONObject> callOnFinished) {
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + location + "&key=AIzaSyAGndCCi5rqyRS7ik8oTvB_G2DLRzgGywM";
-        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONObject loc = jsonObject.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-                    callOnFinished.accept(loc);
-                } catch (JSONException e) {
-                    Log.e("Fragment_Search", e.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
-            }
-        });
-        Volley.newRequestQueue(requireContext()).add(request);
-    }
+        for (int i = 0; i < Objects.requireNonNull(eventsAllDataArray).length(); i++) {
+            JSONObject event = eventsAllDataArray.getJSONObject(i);
+
+            String id = event.optString("id", "");
+            String name = event.optString("name", "");
+            String imageURL = event.optJSONArray("images") != null ? Objects.requireNonNull(event.optJSONArray("images")).optJSONObject(0).optString("url") : "";
+            String venue = event.getJSONObject("_embedded").getJSONArray("venues").getJSONObject(0).getString("name");
+            String categoryEvent = event.getJSONArray("classifications").getJSONObject(0).getJSONObject("segment").getString("name");
+            String date = event.getJSONObject("dates").getJSONObject("start").getString("localDate");
+            String time = Util.getTime(event.getJSONObject("dates").getJSONObject("start").getString("localTime"));
+            String ticketURL = event.getString("url");
+
+            eventsArrayForAdapter.add(new JSONObject()
+                    .put("id", id)
+                    .put("name", name)
+                    .put("imageURL", imageURL)
+                    .put("venue", venue)
+                    .put("categoryEvent", categoryEvent)
+                    .put("date", date)
+                    .put("time", time)
+                    .put("ticketURL", ticketURL)
+            );
+
+        }
+
+        SearchResultsAdapter adapter = new SearchResultsAdapter(requireContext(), eventsArrayForAdapter, null);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
+        search_results_recycler.setLayoutManager(linearLayoutManager);
+        search_results_recycler.setAdapter(adapter);
 
 
-    private void searchEvents(String keyword, String distance, String segment, String geocode, Consumer<JSONObject> callOnFinished) {
-        String eventsUrl = "https://assignment8csci571.uw.r.appspot.com/events?keyword=" + keyword + "&segmentId=" + segment + "&radius=" + distance + "&geoPoint=" + geocode;
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, eventsUrl, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                callOnFinished.accept(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Fragment_Search", error.toString());
-            }
-        });
-        Volley.newRequestQueue(requireContext()).add(req);
+        requireView().findViewById(R.id.search_loading).setVisibility(View.GONE);
+        search_results_recycler.setVisibility(View.VISIBLE);
+
     }
 
 

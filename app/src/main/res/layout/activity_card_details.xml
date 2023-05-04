@@ -8,10 +8,63 @@
     tools:context=".CardDetails">
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/card_details_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/toolbar_black"
         app:titleTextColor="@color/green">
+
+        <ImageButton
+            android:id="@+id/card_detail_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/toolbar_black"
+            android:src="@drawable/green_back_btn">
+
+        </ImageButton>
+
+        <TextView
+            android:id="@+id/card_detail_title"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:text="Card Title"
+            android:singleLine="true"
+            android:textColor="@color/green"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText">
+
+        </TextView>
+
+        <ImageView
+            android:id="@+id/facebook_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="30dp"
+            android:src="@drawable/facebook"></ImageView>
+
+        <ImageView
+            android:id="@+id/twitter_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/circle_twitter_icon">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/heart_card_details"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/heart_outline">
+
+        </ImageView>
 
     </androidx.appcompat.widget.Toolbar>
 

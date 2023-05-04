@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FetchUtil {
 
@@ -93,15 +94,16 @@ public class FetchUtil {
             @Override
             public void onResponse(JSONObject response) {
                 List<String> keywordsResponse = new ArrayList<>();
-                JSONArray attractions;
+                JSONArray attractions = null;
                 try {
                     attractions = response.getJSONObject("_embedded").getJSONArray("attractions");
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    
+                    attractions = new JSONArray();
                 }
 
-                for (int i = 0; i < attractions.length(); i++) {
+                for (int i = 0; i < Objects.requireNonNull(attractions).length(); i++) {
                     try {
 
                         keywordsResponse.add(attractions.getJSONObject(i).getString("name"));

@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -153,7 +154,7 @@ public class Fragment_Search extends Fragment {
                     public void onAnimationEnd(Animation animation) {
 
                         searchForm.setVisibility(View.GONE);
-                        RelativeLayout backLayout = requireView().findViewById(R.id.back_arrow_search_layout);
+                        LinearLayout backLayout = requireView().findViewById(R.id.back_arrow_search_layout);
                         backLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view1) {
@@ -172,7 +173,7 @@ public class Fragment_Search extends Fragment {
                                     public void onAnimationStart(Animation animation) {
                                         requireView().findViewById(R.id.back_arrow_search_layout).setVisibility(View.GONE);
                                         view.findViewById(R.id.search_results_recycler).setVisibility(View.GONE);
-                                        //view.findViewById(R.id.no_events_card).setVisibility(View.GONE);
+                                        view.findViewById(R.id.empty_search).setVisibility(View.GONE);
                                         searchForm.setVisibility(View.VISIBLE);
                                     }
 
@@ -302,7 +303,9 @@ public class Fragment_Search extends Fragment {
         if (eventsJSON.has("_embedded")) {
             eventsAllDataArray = Objects.requireNonNull(eventsJSON.optJSONObject("_embedded")).optJSONArray("events");
         } else {
-            //view.findViewById(R.id.no_events_card).setVisibility(View.VISIBLE);
+            requireView().findViewById(R.id.search_loading).setVisibility(View.INVISIBLE);
+            requireView().findViewById(R.id.empty_search).setVisibility(View.VISIBLE);
+            return;
         }
 
         for (int i = 0; i < Objects.requireNonNull(eventsAllDataArray).length(); i++) {

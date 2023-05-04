@@ -7,17 +7,7 @@
     tools:context=".Fragment_Search">
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/search_results_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:visibility="gone">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/back_arrow_search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +27,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="17dp"
-            android:layout_toEndOf="@+id/back_arrow_search"
             android:text="Back to Search"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -46,7 +35,43 @@
 
         </TextView>
 
-    </RelativeLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_results_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:visibility="gone">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/empty_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="30dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/black"
+        app:cardCornerRadius="25dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="7dp"
+            android:text="No events found"
+            android:textColor="@color/green"
+            android:textSize="20sp"
+            tools:ignore="HardcodedText">
+
+        </TextView>
+
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/search_loading"

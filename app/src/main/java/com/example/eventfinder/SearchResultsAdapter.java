@@ -86,6 +86,13 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
         holder.date.setText(currentCard.optString("date"));
         Glide.with(holder.itemView.getContext()).load(currentCard.optString("imageURL")).into(holder.image);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onCardClicked(currentCard);
+            }
+        });
+
 
     }
 

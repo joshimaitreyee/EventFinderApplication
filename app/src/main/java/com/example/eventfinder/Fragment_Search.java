@@ -1,6 +1,7 @@
 package com.example.eventfinder;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.SwitchCompat;
@@ -335,7 +336,14 @@ public class Fragment_Search extends Fragment {
 
         }
 
-        searchResultsAdapter = new SearchResultsAdapter(requireContext(), eventsArrayForAdapter, null);
+        searchResultsAdapter = new SearchResultsAdapter(requireContext(), eventsArrayForAdapter, new SearchResultsAdapter.CardClicked() {
+            @Override
+            public void onCardClicked(JSONObject cardInfo) {
+                Intent intent = new Intent(requireContext(), CardDetails.class);
+                intent.putExtra("cardInfo", cardInfo.toString());
+                startActivity(intent);
+            }
+        });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         search_results_recycler.setLayoutManager(linearLayoutManager);

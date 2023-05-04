@@ -1,5 +1,6 @@
 package com.example.eventfinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,7 +40,14 @@ public class Fragment_Favorite extends Fragment {
 
         RecyclerView favoriteResultsRecycler = view.findViewById(R.id.favorite_results_recycler);
         try {
-            favoriteResultsAdapter = new FavoriteResultsAdapter(requireContext(), null, new FavoriteResultsAdapter.OnEmptyFavorites() {
+            favoriteResultsAdapter = new FavoriteResultsAdapter(requireContext(), new FavoriteResultsAdapter.CardClicked() {
+                @Override
+                public void onCardClicked(JSONObject cardInfo) {
+                    Intent intent = new Intent(requireContext(), CardDetails.class);
+                    intent.putExtra("cardInfo", cardInfo.toString());
+                    startActivity(intent);
+                }
+            }, new FavoriteResultsAdapter.OnEmptyFavorites() {
                 @Override
                 public void sendEmptyMessage() {
                     view.findViewById(R.id.empty_favorites).setVisibility(View.VISIBLE);

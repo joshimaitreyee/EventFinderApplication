@@ -120,7 +120,7 @@ public class Fragment_Search extends Fragment {
         ((Button) view.findViewById(R.id.button_search)).setOnClickListener(view1 -> {
             String keyword_value = keywordInput.getText().toString();
             String location_value = location.getText().toString();
-            String category_value = categoryDropdown.getSelectedItem().toString();
+            String segment = getSegment(categoryDropdown.getSelectedItem().toString());
             String distance_value = distance.getText().toString();
             Boolean autoDetect_value = autoDetect.isChecked();
 
@@ -202,14 +202,42 @@ public class Fragment_Search extends Fragment {
                     getUserLocation(new Consumer<String>() {
                         @Override
                         public void accept(String userLocation) {
+                            String latitude = userLocation.split(",")[0].trim();
+                            String longitude = userLocation.split(",")[1].trim();
+                            String geocode = getGeoCode(latitude, longitude);
+
+                            searchEvents(keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
+                                @Override
+                                public void accept(JSONObject jsonObject) {
+                                    Log.e("Fragment_Search", jsonObject.toString());
+                                }
+                            });
+
 
                         }
                     });
                 } else {
                     getCoordinatesOfLocation(location_value, new Consumer<JSONObject>() {
                         @Override
-                        public void accept(JSONObject jsonObject) {
-                            Log.e("Fragment_Search", jsonObject.toString());
+                        public void accept(JSONObject locationObject) {
+
+                            try {
+                                String latitude = locationObject.getString("lat");
+                                String longitude = locationObject.getString("lng");
+                                String geocode = getGeoCode(latitude, longitude);
+
+                                searchEvents(keyword_value, distance_value, segment, geocode, new Consumer<JSONObject>() {
+                                    @Override
+                                    public void accept(JSONObject jsonObject) {
+                                        Log.e("Fragment_Search", jsonObject.toString());
+                                    }
+                                });
+
+
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+
                         }
                     });
 
@@ -352,6 +380,23 @@ public class Fragment_Search extends Fragment {
             }
         });
         Volley.newRequestQueue(requireContext()).add(request);
+    }
+
+
+    private void searchEvents(String keyword, String distance, String segment, String geocode, Consumer<JSONObject> callOnFinished) {
+        String eventsUrl = "https://assignment8csci571.uw.r.appspot.com/events?keyword=" + keyword + "&segmentId=" + segment + "&radius=" + distance + "&geoPoint=" + geocode;
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, eventsUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                callOnFinished.accept(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Fragment_Search", error.toString());
+            }
+        });
+        Volley.newRequestQueue(requireContext()).add(req);
     }
 
 

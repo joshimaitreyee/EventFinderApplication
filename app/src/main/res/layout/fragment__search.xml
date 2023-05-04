@@ -7,7 +7,58 @@
     tools:context=".Fragment_Search">
 
 
+    <RelativeLayout
+        android:id="@+id/back_arrow_search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <ImageButton
+            android:id="@+id/back_arrow_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/white"
+            android:src="@drawable/black_back_arrow" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="17dp"
+            android:layout_toEndOf="@+id/back_arrow_search"
+            android:text="Back to Search"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText">
+
+        </TextView>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/search_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:visibility="gone">
+
+        <ProgressBar
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="200dp"
+            android:indeterminateTint="@color/green">
+
+        </ProgressBar>
+
+    </LinearLayout>
+
     <androidx.cardview.widget.CardView
+        android:id="@+id/search_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -159,6 +210,7 @@
                 tools:ignore="HardcodedText,MissingConstraints" />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/auto_detect_switch"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -188,6 +240,7 @@
             tools:ignore="HardcodedText" />
 
         <View
+            android:id="@+id/location_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="25dp"

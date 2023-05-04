@@ -26,7 +26,7 @@ public final class Util {
     public static void displayMessage(View view, Context context, String message) {
 
         Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        snackbar.getView().setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.gray)));
+        snackbar.getView().setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.gray_light)));
         snackbar.setTextColor(ContextCompat.getColor(context, R.color.black));
         ViewGroup.MarginLayoutParams config = (ViewGroup.MarginLayoutParams) snackbar.getView().getLayoutParams();
         config.setMargins(60, 0, 60, 40);

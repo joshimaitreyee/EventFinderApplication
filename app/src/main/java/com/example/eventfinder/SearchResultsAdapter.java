@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -22,10 +23,13 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
     private List<JSONObject> searchResults;
     private CardClicked listener;
 
+    private FavoritesManager favoritesManager;
+
     public SearchResultsAdapter(Context context, List<JSONObject> searchResults, CardClicked listener) {
         this.context = context;
         this.searchResults = searchResults;
         this.listener = listener;
+        this.favoritesManager = new FavoritesManager(context);
     }
 
 
@@ -42,12 +46,47 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
     @Override
     public void onBindViewHolder(@NonNull SearchResultsAdapter.ViewHolder holder, int position) {
         JSONObject currentCard = searchResults.get(position);
+
+        ImageView heartImage = holder.heart;
+        try {
+            if (this.favoritesManager.presentInStorage(currentCard.optString("id"))) {
+                heartImage.setImageResource(R.drawable.heart_filled);
+            } else {
+                heartImage.setImageResource(R.drawable.heart_outline);
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        holder.heart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    String eventId = currentCard.optString("id");
+                    String eventName = currentCard.optString("name");
+                    if (favoritesManager.presentInStorage(eventId)) {
+                        favoritesManager.removeFromStorage(eventId);
+                        holder.heart.setImageResource(R.drawable.heart_outline);
+                        Util.displayMessage(holder.itemView, context, eventName + " removed from favorites");
+                    } else {
+                        favoritesManager.addToStorage(currentCard);
+                        holder.heart.setImageResource(R.drawable.heart_filled);
+                        Util.displayMessage(holder.itemView, context, eventName + " added to favorites");
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         holder.category.setText(currentCard.optString("categoryEvent"));
         holder.name.setText(currentCard.optString("name"));
         holder.venue.setText(currentCard.optString("venue"));
         holder.time.setText(currentCard.optString("time"));
         holder.date.setText(currentCard.optString("date"));
         Glide.with(holder.itemView.getContext()).load(currentCard.optString("imageURL")).into(holder.image);
+
+
     }
 
     @Override

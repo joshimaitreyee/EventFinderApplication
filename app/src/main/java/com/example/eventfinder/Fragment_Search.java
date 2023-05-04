@@ -56,6 +56,7 @@ import java.util.Objects;
  */
 public class Fragment_Search extends Fragment {
 
+    private SearchResultsAdapter searchResultsAdapter;
 
     public Fragment_Search() {
         // Required empty public constructor
@@ -70,6 +71,7 @@ public class Fragment_Search extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment__search, container, false);
+        searchResultsAdapter = new SearchResultsAdapter(requireContext(), new ArrayList<>(), null);
         formSetup(view);
         return view;
     }
@@ -333,11 +335,11 @@ public class Fragment_Search extends Fragment {
 
         }
 
-        SearchResultsAdapter adapter = new SearchResultsAdapter(requireContext(), eventsArrayForAdapter, null);
+        searchResultsAdapter = new SearchResultsAdapter(requireContext(), eventsArrayForAdapter, null);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         search_results_recycler.setLayoutManager(linearLayoutManager);
-        search_results_recycler.setAdapter(adapter);
+        search_results_recycler.setAdapter(searchResultsAdapter);
 
 
         requireView().findViewById(R.id.search_loading).setVisibility(View.GONE);
@@ -345,5 +347,9 @@ public class Fragment_Search extends Fragment {
 
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        searchResultsAdapter.notifyDataSetChanged();
+    }
 }

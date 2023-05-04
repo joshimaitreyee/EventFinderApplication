@@ -3,10 +3,14 @@ package com.example.eventfinder;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.json.JSONException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,6 +19,7 @@ import android.view.ViewGroup;
  */
 public class Fragment_Favorite extends Fragment {
 
+    private FavoriteResultsAdapter favoriteResultsAdapter;
 
     public Fragment_Favorite() {
         // Required empty public constructor
@@ -29,6 +34,47 @@ public class Fragment_Favorite extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment__favorite, container, false);
+        View view = inflater.inflate(R.layout.fragment__favorite, container, false);
+
+        RecyclerView favoriteResultsRecycler = view.findViewById(R.id.favorite_results_recycler);
+        try {
+            favoriteResultsAdapter = new FavoriteResultsAdapter(requireContext(), null, new FavoriteResultsAdapter.OnEmptyFavorites() {
+                @Override
+                public void sendEmptyMessage() {
+                    view.findViewById(R.id.empty_favorites).setVisibility(View.VISIBLE);
+                }
+            });
+
+            favoriteResultsRecycler.setAdapter(favoriteResultsAdapter);
+            favoriteResultsRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+            if (favoriteResultsAdapter.getItemCount() == 0) {
+                view.findViewById(R.id.empty_favorites).setVisibility(View.VISIBLE);
+            } else {
+                favoriteResultsRecycler.setVisibility(View.VISIBLE);
+            }
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            this.favoriteResultsAdapter.reload();
+            this.favoriteResultsAdapter.notifyDataSetChanged();
+            if (this.favoriteResultsAdapter.getItemCount() == 0) {
+                requireView().findViewById(R.id.empty_favorites).setVisibility(View.VISIBLE);
+            } else {
+                requireView().findViewById(R.id.empty_favorites).setVisibility(View.GONE);
+                requireView().findViewById(R.id.favorite_results_recycler).setVisibility(View.VISIBLE);
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

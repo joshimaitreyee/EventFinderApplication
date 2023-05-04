@@ -288,7 +288,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="450dp"
+            android:layout_marginTop="390dp"
             android:layout_marginBottom="20dp">
 
             <Button

@@ -20,7 +20,7 @@
     </style>
 
     <style name="cardDetailsTabsSettings" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Theme.EventFinder.Launch">

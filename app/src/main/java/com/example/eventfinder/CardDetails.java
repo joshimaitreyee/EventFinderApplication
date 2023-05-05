@@ -60,10 +60,17 @@ public class CardDetails extends AppCompatActivity {
             @Override
             public void accept(JSONObject eventResponse) {
                 try {
+                    boolean notAMusicEvent = false;
                     JSONObject venueParam = (JSONObject) eventResponse.getJSONObject("_embedded").getJSONArray("venues").get(0);
                     List<String> artistIDs = new ArrayList<>();
                     List<String> artistNames = Util.extractArtistNames(eventResponse);
+                    if (artistNames.size() == 0) {
+                        artistNames.add("Ed Sheeran");
+                        notAMusicEvent = true;
+                    }
 
+
+                    boolean finalNotAMusicEvent = notAMusicEvent;
                     FetchUtil.getArtistsData(getApplicationContext(), artistNames, new Consumer<Map<String, JSONObject>>() {
                         @Override
                         public void accept(Map<String, JSONObject> artistsMap) {
@@ -82,9 +89,11 @@ public class CardDetails extends AppCompatActivity {
                                     try {
                                         JSONArray artistsResponseArray = createArtistsObject(artistNames, artistsMap, albumsMap);
                                         Bundle bundle = new Bundle();
+                                        bundle.putBoolean("isNotMusic", finalNotAMusicEvent);
                                         bundle.putString("detailResponse", eventResponse.toString());
                                         bundle.putString("venueResponse", venueParam.toString());
                                         bundle.putString("artistsResponseArray", artistsResponseArray.toString());
+
 
                                         TabLayout cardDetailsTabLayout = findViewById(R.id.card_details_tab);
                                         ViewPager2 viewPager2Card = findViewById(R.id.card_detail_viewpager2);

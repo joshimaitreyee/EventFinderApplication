@@ -320,7 +320,13 @@ public class Fragment_Search extends Fragment {
             String venue = event.getJSONObject("_embedded").getJSONArray("venues").getJSONObject(0).getString("name");
             String categoryEvent = event.getJSONArray("classifications").getJSONObject(0).getJSONObject("segment").getString("name");
             String date = event.getJSONObject("dates").getJSONObject("start").getString("localDate");
-            String time = Util.getTime(event.getJSONObject("dates").getJSONObject("start").getString("localTime"));
+            String time = "";
+            try {
+                time = Util.getTime(event.getJSONObject("dates").getJSONObject("start").getString("localTime"));
+            } catch (JSONException exception) {
+                time = "N/A";
+            }
+
             String ticketURL = event.getString("url");
 
             eventsArrayForAdapter.add(new JSONObject()

@@ -1,8 +1,12 @@
 package com.example.eventfinder;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +25,7 @@ import org.json.JSONObject;
 public class Fragment_Artists extends Fragment {
 
     private JSONArray artistsJSONArray;
+    private Boolean isNotMusic;
 
     public Fragment_Artists() {
         // Required empty public constructor
@@ -33,6 +38,7 @@ public class Fragment_Artists extends Fragment {
         if (getArguments() != null) {
             try {
                 this.artistsJSONArray = new JSONArray(getArguments().getString("artistsResponseArray"));
+                this.isNotMusic = getArguments().getBoolean("isNotMusic");
                 Log.e("Fragment_Artists", this.artistsJSONArray.toString());
             } catch (JSONException e) {
                 throw new RuntimeException(e);
@@ -43,7 +49,28 @@ public class Fragment_Artists extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment__artists, container, false);
+
+        View view = inflater.inflate(R.layout.fragment__artists, container, false);
+
+        RecyclerView artistsResultsRecycler = view.findViewById(R.id.artists_result);
+        ArtistsResultsAdapter adapter = new ArtistsResultsAdapter(this.artistsJSONArray, new ArtistsResultsAdapter.CardClicked() {
+            @Override
+            public void artistLinkClicked(String url) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+
+        artistsResultsRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+        artistsResultsRecycler.setAdapter(adapter);
+        if (!this.isNotMusic) {
+            artistsResultsRecycler.setVisibility(View.VISIBLE);
+        } else {
+            view.findViewById(R.id.not_music_event).setVisibility(View.VISIBLE);
+        }
+
+
+        return view;
     }
 }

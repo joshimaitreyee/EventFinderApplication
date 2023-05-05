@@ -13,6 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EventFinder.Launch"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version">
+        </meta-data>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAGndCCi5rqyRS7ik8oTvB_G2DLRzgGywM"></meta-data>
+
         <activity
             android:name=".CardDetails"
             android:exported="false" />

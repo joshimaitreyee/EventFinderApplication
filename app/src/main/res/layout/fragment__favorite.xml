@@ -15,10 +15,10 @@
     <androidx.cardview.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/empty_favorites"
         android:layout_width="match_parent"
+        android:layout_marginEnd="30dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="450dp"
-        android:layout_marginEnd="30dp"
         android:visibility="gone"
         app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="25dp">

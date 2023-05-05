@@ -64,6 +64,7 @@ public class Fragment_Venue extends Fragment {
         name.setSelected(true);
 
         SupportMapFragment map = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        assert map != null;
         map.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
